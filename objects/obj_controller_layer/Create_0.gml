@@ -1,0 +1,1 @@
+global.mundo_atual = "mundo1"
