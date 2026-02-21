@@ -11,6 +11,7 @@ chao = false
 
 movimentacao = function (){
     
+    //Inputs
     left = keyboard_check(ord("A"))
     rigth = keyboard_check(ord("D"))
     space = keyboard_check_pressed(vk_space)
