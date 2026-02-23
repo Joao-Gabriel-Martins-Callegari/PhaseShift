@@ -1,4 +1,4 @@
-if(keyboard_check_pressed(ord("F"))){
+if(keyboard_check_pressed(ord("F")) and global.powerUp == true){
     global.mundo_atual = (global.mundo_atual == "mundo1") ? "mundo2" : "mundo1"
     
     
