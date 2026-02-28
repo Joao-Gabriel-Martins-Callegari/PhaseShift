@@ -24,9 +24,7 @@ qtd_chaves = instance_number(obj_chave)
 
 global.powerUp = false
 
-image_xscale = 1.6
-image_yscale = image_xscale
-
+mask_index = spr_player_idle
 
 movimentacao = function (){
     
@@ -45,9 +43,11 @@ movimentacao = function (){
     
     if(global.mundo_atual == "mundo1"){
         obj_chao.image_index = 0
+        image_index = 0
         array_push(_colisoes_atuais,obj_parede01)
     }else {
         obj_chao.image_index = 1
+        image_index = 1
     	array_push(_colisoes_atuais,obj_parede02)
     }
     
@@ -62,13 +62,6 @@ movimentacao = function (){
         if(space and chao){
             velv -= max_velv
         }
-    }
-    
-    
-    if(velh != 0){
-        sprite_index = spr_player_run
-    }else {
-    	sprite_index = spr_player_idle
     }
     
     
@@ -96,38 +89,52 @@ movimentacao = function (){
     
     abre_cadeado()
     
-    move_and_collide(velh,0,_colisoes_atuais,12)
-    move_and_collide(0,velv,_colisoes_atuais,12)
+    move_and_collide(velh,0,_colisoes_atuais,24)
+    move_and_collide(0,velv,_colisoes_atuais,24)
     chao = place_meeting(x,y+1,_colisoes_atuais)
+    
+    
+    
 }
 
 dash_player = function (){
-    
     if(!dei_dash){
         var _left = keyboard_check(ord("A"))
         var _right = keyboard_check(ord("D"))
-        var _up = keyboard_check(ord("W"))
-        var _down = keyboard_check(ord("S"))
         dash = keyboard_check_pressed(ord("J"))
         
         var _dir = point_direction(0,0,(_right - _left), 0)
         
         if(dash){
+            image_yscale = 0.6
             screenshake(5)
-            timer_duracao--
-            velh = lengthdir_x(vel_dash,_dir)
+            velh = lengthdir_x(vel_dash, _dir)
             velv = 0
             dei_dash = true
+            timer_duracao = timer_dash; // Reinicia o timer aqui
         }
     }
     
-    if(timer_duracao % 3 == 0){
-        var _rastro = instance_create_depth(x,y,depth+1,obj_rastro)
-       _rastro.sprite_index = sprite_index
-       _rastro.image_index = image_index
-       _rastro.image_xscale = image_xscale    
-       _rastro.image_speed = 0    
+    // Se estou no dash, o timer corre
+    if (dei_dash) {
+        timer_duracao--;
+        if (timer_duracao <= 0) {
+            // Quando o dash acaba, voltamos à velocidade normal
+            velh = 0; 
+            dei_dash = false;
+        }
+        
+        // Efeito de rastro
+        if(timer_duracao % 3 == 0){
+            var _rastro = instance_create_depth(x,y,depth+1,obj_rastro)
+            _rastro.sprite_index = sprite_index
+            _rastro.image_index = image_index
+            _rastro.image_xscale = image_xscale    
+            _rastro.image_speed = 0    
+        }
     }
+    
+    image_yscale = lerp(image_yscale, 1, .2)
 }
 
 morte_player = function (){
@@ -162,23 +169,14 @@ abre_cadeado = function (){
             //Se isso for true
             //Eu uso a imagem do cadeado desbloqueado
             _cadeado.image_index = 1
+            
+            _cadeado.abrindo = true
+            _cadeado.mask_index = -1
+            
         }else {
             //Se não, eu uso ele bloqueado
         	_cadeado.image_index = 0
         }
     }
     
-}
-
-
-//Metodo de mudar de sprite
-muda_sprite = function (_sprite = spr_chao){ //Passando uma sprite como parametro
-    //Verificando se a minha sprite atual é diferente
-    //Da sprite que eu passei como parametro
-    if(sprite_index != _sprite){
-        //Se sim, eu mudo minha sprite
-        sprite_index = _sprite
-        //Faço minha sprite começar do inicio
-        image_index = 0
-    }
 }
